@@ -177,6 +177,7 @@ def adicionar_coluna_ranque(df_base, num_can):
 #======================================================================================
 # Para iniciar o servidor com uma folha de tema externa
 app = Dash(__name__, external_stylesheets=[dbc.themes.CYBORG])
+server = app.server
 
 center_lat, center_lon = -5.7, -45.2 #-5.21,-45.52
 colors={
