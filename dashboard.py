@@ -313,7 +313,7 @@ app.layout = dbc.Container(
                             dbc.Col(id='cardT_repre_cand_mun'),
                             dbc.Col(id='card_repre_cand_mun'),
                         ])
-                    ], style={'height':'300px', 'textAlign':'center'})#'backgroundColor':'white',
+                    ], style={'height':'350px', 'textAlign':'center'})#'backgroundColor':'white',
                 ]),#id='coluna_cards'
                 dbc.Col([dcc.Tab(id='tab-anal-mun', style={'height':'100vh'}),], md=6),
             ], style={'margin-top':'15px'})
