@@ -315,7 +315,11 @@ app.layout = dbc.Container(
                         ])
                     ], style={'height':'350px', 'textAlign':'center'})#'backgroundColor':'white',
                 ]),#id='coluna_cards'
-                dbc.Col([dcc.Tab(id='tab-anal-mun', style={'height':'100vh'}),], md=6),
+                dbc.Col([
+                    html.Div([
+                        dcc.Tab(id='tab-anal-mun', style={'height':'100vh'}),
+                    ], style={'height':'380px', 'textAlign':'center'})#'backgroundColor':'white',
+                ], md=6),
             ], style={'margin-top':'15px'})
             ], md=8)
     ], class_name='g-0')
