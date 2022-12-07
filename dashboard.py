@@ -83,6 +83,8 @@ df_base.rename(columns={
     'DS_SIT_TOT_TURNO':'Situação',
     'NM_URNA_CANDIDATO_x':'Candidato',
 },inplace=True)
+
+df_base
 # Filtro para apenas Deputados Estadual
 #df_base = df_base.loc[df_base['DS_CARGO']=='Deputado Estadual']
 
@@ -150,7 +152,8 @@ def calc_tabela(num_can_inic):
 
 def adicionar_coluna_ranque(df_base, num_can):
     # DataFrame com os municípios com votos do candidato
-    df_cand = df_base.loc[(df_base['NR_CANDIDATO_x']==num_can)&(df_base['Votos'] > 0)].sort_values('Votos', ascending=False)
+    #df_cand = df_base.loc[(df_base['NR_CANDIDATO_x']==num_can)&(df_base['Votos'] > 0)].sort_values('Votos', ascending=False)
+    df_cand = df_base.loc[df_base['NR_CANDIDATO_x']==num_can].sort_values('Votos', ascending=False)
     # Cargo do candidato
     cargo_cand = df_cand['DS_CARGO'].iloc[0]
     # DataFrame do cargo do candidato selecionado
@@ -160,7 +163,9 @@ def adicionar_coluna_ranque(df_base, num_can):
     # Percorrendo a lista dos municípios com votos no candidato
     for mun in df_cand['CodIBGE']:
         # DataFrame com os votos por candidatos no cargo do selecionado
-        df_cargo_mun = df_cargo[(df_cargo['CodIBGE']==mun)&(df_cargo['Votos']>0)].sort_values(by='Votos', ascending=True)
+        #df_cargo_mun = df_cargo[(df_cargo['CodIBGE']==mun)&(df_cargo['Votos']>0)].sort_values(by='Votos', ascending=True)
+        # Passei a usar essa função no mapa também
+        df_cargo_mun = df_cargo[df_cargo['CodIBGE']==mun].sort_values(by='Votos', ascending=True)
         # Calculando ranque para todos os candidatos ao cargo no município
         df_cargo_mun['rank'] = (df_cargo_mun['Votos'].rank(ascending=False)).astype(int)
         # Coletando o posicionamento do selecionado no município
@@ -169,7 +174,8 @@ def adicionar_coluna_ranque(df_base, num_can):
         df_cand.loc[df_cand['CodIBGE'] == mun,'Rank'] = rank
     
     #df = df_cand[['Município','Votos','Rank']]
-    df = df_cand[['CodIBGE','Município','Votos','Rank']]
+    #df = df_cand[['CodIBGE','Município','Votos','Rank']]
+    df = df_cand[['CodIBGE','Município','Prefeito','Partido','Votos','Rank']]
     return df
 
 
@@ -186,6 +192,7 @@ colors={
 
 #________________ Mapa
 def gerar_mapa(df):
+    # https://plotly.com/python/reference/choroplethmapbox/
     fig = px.choropleth_mapbox( 
         df, 
         center={'lat':center_lat, 'lon':center_lon}, zoom=5.4,      
@@ -195,19 +202,24 @@ def gerar_mapa(df):
         color_continuous_scale='Redor', opacity=0.4,
         hover_data={        
             'Município':True,
+            'Rank':True,
+            'Votos':True,
             'Prefeito':True,
             'Partido':True,
-            'Votos':True,
             'CodIBGE': False,
         },
     )
-
+    # Para inverter a escala de cores
+    # https://plotly.com/python/reference/choroplethmapbox/#choroplethmapbox-reversescale
+    fig.update_traces(reversescale=True)
+    
     fig.update_layout(
         paper_bgcolor=colors['paper_bgcolor'],
         autosize=True,
         margin=go.layout.Margin(l=0, r=0, t=0, b=0),
         showlegend=True,
         mapbox_style='carto-darkmatter'
+        #mapbox_style='carto-positron'
     )
     return fig
 
@@ -340,7 +352,8 @@ def imprimir_tabela_candidato(value):
     if value==None:
         return None
     #df = calc_tabela(value)
-    df = adicionar_coluna_ranque(df_base, value)    
+    df = adicionar_coluna_ranque(df_base, value)
+    df = df[df['Votos']>0]
     tabela = dash_table.DataTable(
         df.to_dict('records'), [{"name": i, "id": i} for i in df.columns],
         id='tbl',
@@ -350,7 +363,7 @@ def imprimir_tabela_candidato(value):
         page_size=11,
         sort_action="native",
         sort_mode="multi",
-        hidden_columns=['CodIBGE'],
+        hidden_columns=['CodIBGE','Prefeito','Partido'],
         style_header={'backgroundColor': '#282828', 'fontWeight': 'bold', 'textAlign':'center', 'border':'0.5px black'},
         style_data={'backgroundColor': '#282828', 'color':'#EAEAEA','border':'0.5px solid black'},
         style_as_list_view=True,
@@ -566,7 +579,7 @@ def mapa_interacao(value):
     if value == None:
         raise PreventUpdate
     else:
-        df_cand_mun_ =  df_base.loc[df_base['NR_CANDIDATO_x']==value].sort_values('CodIBGE', ascending=True)
+        df_cand_mun_ =  adicionar_coluna_ranque(df_base, value)#.sort_values('CodIBGE', ascending=True)
         fig = gerar_mapa(df_cand_mun_)
 
         linha_mapa = [
@@ -640,4 +653,4 @@ def update_alerta(data, active_cell):
 
 
 if __name__=='__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)
