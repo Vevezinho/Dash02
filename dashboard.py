@@ -31,7 +31,7 @@ from dash.exceptions import PreventUpdate
 #______________ Carregando e Configurando arquivos de dados
 # Arquivo de definições
 dict_df_set = pd.read_excel(
-    r'dados\df_set.xlsx',
+    r'df_set.xlsx',
     sheet_name=['df_votacao_deputados_ma','TbCv_codMunic_IbgeTse'],
     )
 df_set_votacao_deputados_ma = dict_df_set['df_votacao_deputados_ma']
