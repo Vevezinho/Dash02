@@ -37,8 +37,8 @@ dict_df_set = pd.read_excel(
 df_set_votacao_deputados_ma = dict_df_set['df_votacao_deputados_ma']
 df_set_TbCv_codMunic_IbgeTse = dict_df_set['TbCv_codMunic_IbgeTse']
 # Arquivos de dados
-arq_zip = r'dados\votacao_candidato_munzona_2022_MA.zip'
-arq_TbCv = r'dados\TbCv_codMunic_IbgeTse.xlsx'
+arq_zip = r'votacao_candidato_munzona_2022_MA.zip'
+arq_TbCv = r'TbCv_codMunic_IbgeTse.xlsx'
 
 # Carregando GeoJson
 geo_ma_mun = json.load(open('geojson/geojs-21-mun.json','r',encoding='utf-8'))
